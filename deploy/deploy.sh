@@ -20,6 +20,6 @@ echo "going to deploy the application"
 NS=bk
 kubectl get ns/$NS || kubectl create namespace $NS
 cd $( dirname $0 )/..
-build_container
+#build_container
 cd $( dirname $0 )
 kubectl apply -f bk.yaml -n $NS

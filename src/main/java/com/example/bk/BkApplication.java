@@ -3,6 +3,7 @@ package com.example.bk;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
@@ -35,8 +36,9 @@ public class BkApplication {
 
 	@Bean
 	@ConditionalOnCloudPlatform(CloudPlatform.KUBERNETES)
-	ApplicationListener<ApplicationReadyEvent> runningInKubernetes() {
-		return event -> System.out.println("Hello, Kubernetes!");
+	ApplicationListener<ApplicationReadyEvent> runningInKubernetes(
+		@Value("${execution-environment:localhost}") String executionEnv) {
+		return event -> System.out.println("Hello, world, from " + executionEnv + "!");
 	}
 
 	@Bean
@@ -88,6 +90,8 @@ public class BkApplication {
 	}
 
 	public static void main(String[] args) {
+		System.setProperty("spring.main.cloud-platform", "kubernetes");
+		System.setProperty("EXECUTION_ENVIRONMENT", "cloud9");
 		SpringApplication.run(BkApplication.class, args);
 	}
 }

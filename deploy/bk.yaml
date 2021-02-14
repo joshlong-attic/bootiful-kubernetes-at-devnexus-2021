@@ -5,17 +5,20 @@ metadata:
   labels:
     app: bk
 spec:
-
   replicas: 1
   selector:
     matchLabels:
       app: bk
+
   template:
     metadata:
       labels:
         app: bk
     spec:
       terminationGracePeriodSeconds: 20
+      volumes:
+        - name: bk-configmap
+
       containers:
         - name: bk
           image: gcr.io/bootiful/bk
@@ -27,6 +30,10 @@ spec:
             httpGet:
               port: 8080
               path: /actuator/health/liveness
+          volumeMounts:
+            - name: "config"
+              mountPath: "/config"
+              readOnly: true
           env:
             - name: SERVER_PORT
               value: "8080"
@@ -36,10 +43,19 @@ spec:
 
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bk-configmap
+data:
+  execution-environment: "Kubernetes"
+  server.port: "8080"
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: bk-service
 spec:
+  type: LoadBalancer
   selector:
     app: bk
   ports:
