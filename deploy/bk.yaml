@@ -1,22 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: customers-deployment
+  name: bk-deployment
   labels:
-    app: customers
+    app: bk
 spec:
+
   replicas: 1
   selector:
     matchLabels:
-      app: customers
+      app: bk
   template:
     metadata:
       labels:
-        app: customers
+        app: bk
     spec:
+      terminationGracePeriodSeconds: 20
       containers:
-        - name: customers
-          image: gcr.io/bootiful/customers
+        - name: bk
+          image: gcr.io/bootiful/bk
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health/readiness
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health/liveness
           env:
             - name: SERVER_PORT
               value: "8080"
@@ -28,10 +38,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: customers-service
+  name: bk-service
 spec:
   selector:
-    app: customers
+    app: bk
   ports:
     - port: 80
       targetPort: 8080

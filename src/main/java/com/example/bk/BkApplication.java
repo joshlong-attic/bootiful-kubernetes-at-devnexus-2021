@@ -5,8 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;
+import org.springframework.boot.cloud.CloudPlatform;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -28,8 +30,14 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class BkApplication {
+
+	@Bean
+	@ConditionalOnCloudPlatform(CloudPlatform.KUBERNETES)
+	ApplicationListener<ApplicationReadyEvent> runningInKubernetes() {
+		return event -> System.out.println("Hello, Kubernetes!");
+	}
 
 	@Bean
 	RouterFunction<ServerResponse> routes(ApplicationContext context,
@@ -53,12 +61,9 @@ public class BkApplication {
 	public void availabilityChangeEvent(AvailabilityChangeEvent<?> ace) {
 		System.out.println(
 			Objects.requireNonNull(ace.getResolvableType()) + ":" +
-			ace.getState().toString());
+				ace.getState().toString());
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(BkApplication.class, args);
-	}
 
 	@Bean
 	ApplicationListener<ApplicationReadyEvent> ready(
@@ -80,6 +85,10 @@ public class BkApplication {
 			ddl.thenMany(saved).thenMany(customerRepository.findAll()).subscribe(System.out::println);
 
 		};
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(BkApplication.class, args);
 	}
 }
 
