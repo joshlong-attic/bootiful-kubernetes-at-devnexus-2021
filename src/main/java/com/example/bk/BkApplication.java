@@ -90,8 +90,8 @@ public class BkApplication {
 	}
 
 	public static void main(String[] args) {
-		System.setProperty("spring.main.cloud-platform", "kubernetes");
-		System.setProperty("EXECUTION_ENVIRONMENT", "cloud9");
+//		System.setProperty("spring.main.cloud-platform", "kubernetes");
+//		System.setProperty("EXECUTION_ENVIRONMENT", "cloud9");
 		SpringApplication.run(BkApplication.class, args);
 	}
 }

@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-
 function build_container() {
+  #gcr.io/bootiful/bk
   APP_NAME=bk
   GCR_IMAGE_NAME=gcr.io/bootiful/${APP_NAME}
+  docker images -q $GCR_IMAGE_NAME | while read l; do docker rmi -f $l; done
+
+  echo "Building $GCR_IMAGE_NAME"
   mvn -f pom.xml \
     -DskipTests=true \
     clean spring-boot:build-image -e \
@@ -15,11 +18,10 @@ function build_container() {
   docker push ${GCR_IMAGE_NAME}:latest
 }
 
-
 echo "going to deploy the application"
 NS=bk
 kubectl get ns/$NS || kubectl create namespace $NS
-cd $( dirname $0 )/..
+cd $(dirname $0)/..
 #build_container
-cd $( dirname $0 )
+cd $(dirname $0)
 kubectl apply -f bk.yaml -n $NS

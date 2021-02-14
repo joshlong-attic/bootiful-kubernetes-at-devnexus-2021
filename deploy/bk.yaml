@@ -15,6 +15,7 @@ spec:
       labels:
         app: bk
     spec:
+
       terminationGracePeriodSeconds: 20
       volumes:
         - name: bk-configmap-volume
@@ -22,8 +23,10 @@ spec:
             name: bk-configmap
 
       containers:
+
         - name: bk
           image: gcr.io/bootiful/bk
+          imagePullPolicy: Always
           readinessProbe:
             httpGet:
               port: 8080
@@ -33,15 +36,18 @@ spec:
               port: 8080
               path: /actuator/health/liveness
           volumeMounts:
-            - name:  bk-configmap-volume
+            - name: bk-configmap-volume
               mountPath: "/config"
               readOnly: true
           env:
+            - name: "SPRING_PROFILES_ACTIVE"
+              value: "cloud"
             - name: SERVER_PORT
               value: "8080"
           ports:
             - containerPort: 8080
               hostPort: 80
+
 
 ---
 apiVersion: v1
