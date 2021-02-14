@@ -17,7 +17,9 @@ spec:
     spec:
       terminationGracePeriodSeconds: 20
       volumes:
-        - name: bk-configmap
+        - name: bk-configmap-volume
+          configMap:
+            name: bk-configmap
 
       containers:
         - name: bk
@@ -31,7 +33,7 @@ spec:
               port: 8080
               path: /actuator/health/liveness
           volumeMounts:
-            - name: "config"
+            - name:  bk-configmap-volume
               mountPath: "/config"
               readOnly: true
           env:
