@@ -1,9 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: bk-deployment
   labels:
     app: bk
+
 spec:
   replicas: 1
   selector:
@@ -57,6 +59,8 @@ metadata:
 data:
   execution-environment: "Kubernetes"
   server.port: "8080"
+
+
 ---
 apiVersion: v1
 kind: Service
